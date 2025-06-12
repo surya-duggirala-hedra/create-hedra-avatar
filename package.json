@@ -1,0 +1,38 @@
+{
+    "name": "create-hedra-avatar",
+    "version": "0.1.0",
+    "description": "Scaffold a LiveKit + Hedra Avatar app with Python backend and React frontend",
+    "bin": {
+        "create-hedra-avatar": "./create.js"
+    },
+    "files": [
+        "create.js",
+        "template"
+    ],
+    "keywords": [
+        "hedra",
+        "livekit",
+        "avatar",
+        "scaffold",
+        "create-app",
+        "video-agent",
+        "voice-assistant"
+    ],
+    "author": "Surya Duggirala",
+    "license": "MIT",
+    "scripts": {
+        "start": "concurrently \"npm run dev --prefix template\" \"npm run agent --prefix template\"",
+        "dev": "npm run dev --prefix template",
+        "agent": "cd template && pip install -r requirements.txt && python agent_worker.py"
+    },
+    "dependencies": {
+        "child_process": "^1.0.2",
+        "concurrently": "^8.0.0",
+        "fs-extra": "^11.3.0",
+        "path": "^0.12.7",
+        "prompts": "^2.4.2"
+    },
+    "engines": {
+        "node": ">=16"
+    }
+}
