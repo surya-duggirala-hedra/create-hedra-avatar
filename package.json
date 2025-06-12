@@ -22,8 +22,8 @@
     "license": "MIT",
     "scripts": {
         "start": "concurrently \"npm run dev --prefix template\" \"npm run agent --prefix template\"",
-        "dev": "npm run dev --prefix template",
-        "agent": "cd template && pip install -r requirements.txt && python agent_worker.py"
+        "dev": "npm run dev --prefix template/frontend",
+        "agent": "cd template/backend && pip install -r requirements.txt && python agent_worker.py"
     },
     "dependencies": {
         "child_process": "^1.0.2",

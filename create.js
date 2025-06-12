@@ -37,7 +37,7 @@ async function main() {
 
   // Rename .env.example -> .env
   const envExamplePath = path.join(targetDir, '.env.example');
-  const envPath = path.join(targetDir, '.env');
+  const envPath = path.join(targetDir, '.env.local');
   if (fs.existsSync(envExamplePath)) {
     fs.moveSync(envExamplePath, envPath, { overwrite: true });
   }
