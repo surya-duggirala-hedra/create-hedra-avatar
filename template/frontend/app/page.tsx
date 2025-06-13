@@ -50,7 +50,11 @@ export default function Page() {
   }, [room]);
 
   return (
+    // anchor
     <main data-lk-theme="default" className="h-full grid content-center bg-[var(--lk-bg)]">
+      <div className="w-full flex justify-center mb-8">
+        <img src="assets/hedra_logo.svg" alt="Hedra Logo" className="h-16 w-auto" />
+      </div>
       <RoomContext.Provider value={room}>
         <div className="lk-room-container max-w-[1024px] w-[90vw] mx-auto max-h-[90vh]">
           <SimpleVoiceAssistant onConnectButtonClicked={onConnectButtonClicked} />

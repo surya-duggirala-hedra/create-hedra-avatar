@@ -7022,6 +7022,14 @@ async function main() {
   console.log(`
 Creating project in ${targetDir}...`);
   await fs.copy(templateDir, targetDir);
+  const rootPkg = require(path.join(__dirname, "package.json"));
+  const frontendPkgPath = path.join(targetDir, "frontend", "package.json");
+  if (fs.existsSync(frontendPkgPath)) {
+    const frontendPkg = fs.readJsonSync(frontendPkgPath);
+    frontendPkg.name = rootPkg.name;
+    frontendPkg.version = rootPkg.version;
+    fs.writeJsonSync(frontendPkgPath, frontendPkg, { spaces: 2 });
+  }
   const envExamplePath = path.join(targetDir, ".env.example");
   const envPath = path.join(targetDir, ".env.local");
   if (fs.existsSync(envExamplePath)) {
