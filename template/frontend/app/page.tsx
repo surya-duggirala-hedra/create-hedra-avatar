@@ -112,7 +112,6 @@ function SimpleVoiceAssistant(props: { onConnectButtonClicked: () => void }) {
 
 function AgentVisualizer() {
   const { state: agentState, videoTrack, audioTrack } = useVoiceAssistant();
-
   if (videoTrack) {
     return (
       <div className="h-[512px] w-[512px] rounded-lg overflow-hidden">
