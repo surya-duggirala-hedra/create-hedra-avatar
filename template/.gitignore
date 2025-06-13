@@ -1,2 +1,5 @@
-backend/.env.local
-frontend/.env.local
+# env files
+**/.env*
+
+# node modules
+**/node_modules/
