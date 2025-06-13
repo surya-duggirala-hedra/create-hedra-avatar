@@ -1,6 +1,6 @@
 {
     "name": "@surya-duggirala-hedra/create-hedra-avatar",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "description": "Scaffold a LiveKit + Hedra Avatar app with Python backend and React frontend",
     "bin": {
         "create-hedra-avatar": "./create.cjs"
