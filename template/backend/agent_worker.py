@@ -18,13 +18,9 @@ logger = logging.getLogger("hedra-avatar-example")
 logger.setLevel(logging.INFO)
 
 if os.path.exists(".env.local"):
-    print("[debug] Loading .env.local")
     load_dotenv(dotenv_path=".env.local")
 else:
-    print("[debug] Loading .env")
     load_dotenv()
-
-print("[debug] LIVEKIT_API_KEY =", os.getenv("LIVEKIT_API_KEY"))
 
 async def entrypoint(ctx: JobContext):
     await ctx.connect()
