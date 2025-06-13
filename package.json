@@ -19,9 +19,8 @@
         "voice-assistant"
     ],
     "author": "Surya Duggirala",
-    "license": "MIT",
     "scripts": {
-        "start-app": "pnpm dev --prefix template/frontend",
+        "start-app": "pnpm run dev --prefix template/frontend",
         "start-agent": "pip install -r template/backend/requirements.txt && python template/backend/agent_worker.py start"
     },
     "dependencies": {
