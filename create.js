@@ -6,15 +6,22 @@ const prompts = require('prompts');
 const { execSync } = require('child_process');
 
 async function main() {
-  const response = await prompts({
-    type: 'text',
-    name: 'projectName',
-    message: 'Project name:',
-    initial: 'hedra-avatar-app',
-    validate: name => name ? true : 'Project name cannot be empty',
-  });
+  let projectName;
+  
+  // Check for command line argument
+  if (process.argv[2]) {
+    projectName = process.argv[2].trim();
+  } else {
+    const response = await prompts({
+      type: 'text',
+      name: 'projectName',
+      message: 'Project name:',
+      initial: 'hedra-avatar-app',
+      validate: name => name ? true : 'Project name cannot be empty',
+    });
+    projectName = response.projectName.trim();
+  }
 
-  const projectName = response.projectName.trim();
   const templateDir = path.join(__dirname, 'template');
   const targetDir = path.join(process.cwd(), projectName);
 
@@ -44,15 +51,22 @@ async function main() {
 
   // Install dependencies
   console.log('\nInstalling dependencies. This might take a minute...');
-  execSync('npm install', { cwd: targetDir, stdio: 'inherit' });
+  console.log('\nInstalling frontend dependencies...');
+  execSync('pnpm install', { cwd: path.join(targetDir, 'frontend'), stdio: 'inherit' });
+  
+  console.log('\nInstalling backend dependencies...');
+  execSync('pip install -r requirements.txt', { cwd: path.join(targetDir, 'backend'), stdio: 'inherit' });
+  
 
   // Done
   console.log('\n✅ Success! Your Hedra Avatar app is ready.\n');
   console.log(`Next steps:
   cd ${projectName}
-  npm start
+  
+  To start the frontend: npm run start-app
+  To start the backend: npm run start-agent
 
-Your app will be available at http://localhost:3000 once both frontend and backend are running.
+  Your app will be available at http://localhost:3000 once both frontend and backend are running.
 `);
 }
 
