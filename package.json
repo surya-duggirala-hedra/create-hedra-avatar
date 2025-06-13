@@ -21,9 +21,8 @@
     "author": "Surya Duggirala",
     "license": "MIT",
     "scripts": {
-        "start": "concurrently \"npm run dev --prefix template\" \"npm run agent --prefix template\"",
-        "dev": "npm run dev --prefix template/frontend",
-        "agent": "cd template/backend && pip install -r requirements.txt && python agent_worker.py"
+        "start-app": "npm run dev --prefix template/frontend",
+        "start-agent": "pip install -r template/backend/requirements.txt && python template/backend/agent_worker.py start"
     },
     "dependencies": {
         "child_process": "^1.0.2",
