@@ -20,7 +20,7 @@
     ],
     "author": "Surya Duggirala",
     "scripts": {
-        "start-app": "pnpm run dev --prefix template/frontend",
+        "start-app": "npm install && npm run dev --prefix template/frontend",
         "start-agent": "pip install -r template/backend/requirements.txt && python template/backend/agent_worker.py start"
     },
     "dependencies": {
@@ -35,5 +35,8 @@
     },
     "publishConfig": {
         "access": "public"
+    },
+    "devDependencies": {
+        "esbuild": "^0.25.5"
     }
 }
