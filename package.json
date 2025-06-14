@@ -1,37 +1,41 @@
 {
-  "name": "voice-assistant2",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "format:check": "prettier --check .",
-    "format:write": "prettier --write ."
-  },
-  "dependencies": {
-    "@livekit/components-react": "^2.9.3",
-    "@livekit/components-styles": "^1.1.4",
-    "framer-motion": "^11.18.0",
-    "livekit-client": "^2.8.0",
-    "livekit-server-sdk": "^2.9.7",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
-    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
-    "@types/node": "^20.17.13",
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "14.2.29",
-    "eslint-config-prettier": "9.1.0",
-    "next": "14",
-    "postcss": "^8.5.1",
-    "prettier": "^3.4.2",
-    "tailwindcss": "^3.4.17",
-    "typescript": "^5.7.3"
-  },
-  "packageManager": "pnpm@9.15.9"
+    "name": "@surya-duggirala-hedra/create-hedra-avatar",
+    "version": "0.1.11",
+    "description": "Scaffold a LiveKit + Hedra Avatar app with Python backend and React frontend",
+    "bin": {
+        "create-hedra-avatar": "./create.cjs"
+    },
+    "files": [
+        "create.js",
+        "template"
+    ],
+    "keywords": [
+        "hedra",
+        "livekit",
+        "avatar",
+        "scaffold",
+        "create-app",
+        "video-agent",
+        "voice-assistant"
+    ],
+    "author": "Surya Duggirala",
+    "scripts": {
+        "build": "npx esbuild create.js --bundle --platform=node --outfile=dist/create.js",
+        "publish": "npm publish"
+    },
+    "dependencies": {
+        "child_process": "^1.0.2",
+        "fs-extra": "^11.3.0",
+        "path": "^0.12.7",
+        "prompts": "^2.4.2"
+    },
+    "engines": {
+        "node": ">=16"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "devDependencies": {
+        "esbuild": "^0.25.5"
+    }
 }

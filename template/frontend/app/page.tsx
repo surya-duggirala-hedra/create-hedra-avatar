@@ -1,8 +1,8 @@
 "use client";
 
-import { CloseIcon } from "@/components/CloseIcon";
-import { NoAgentNotification } from "@/components/NoAgentNotification";
-import TranscriptionView from "@/components/TranscriptionView";
+import { CloseIcon } from "@components/CloseIcon";
+import { NoAgentNotification } from "@components/NoAgentNotification";
+import TranscriptionView from "@components/TranscriptionView";
 import {
   BarVisualizer,
   DisconnectButton,
@@ -50,7 +50,11 @@ export default function Page() {
   }, [room]);
 
   return (
+    // anchor
     <main data-lk-theme="default" className="h-full grid content-center bg-[var(--lk-bg)]">
+      <div className="w-full flex justify-center mb-8">
+        <img src="assets/hedra_logo.svg" alt="Hedra Logo" className="h-16 w-auto" />
+      </div>
       <RoomContext.Provider value={room}>
         <div className="lk-room-container max-w-[1024px] w-[90vw] mx-auto max-h-[90vh]">
           <SimpleVoiceAssistant onConnectButtonClicked={onConnectButtonClicked} />
@@ -112,7 +116,6 @@ function SimpleVoiceAssistant(props: { onConnectButtonClicked: () => void }) {
 
 function AgentVisualizer() {
   const { state: agentState, videoTrack, audioTrack } = useVoiceAssistant();
-
   if (videoTrack) {
     return (
       <div className="h-[512px] w-[512px] rounded-lg overflow-hidden">

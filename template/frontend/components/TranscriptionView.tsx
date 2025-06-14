@@ -1,4 +1,4 @@
-import useCombinedTranscriptions from "@/hooks/useCombinedTranscriptions";
+import useCombinedTranscriptions from "@hooks/useCombinedTranscriptions";
 import * as React from "react";
 
 export default function TranscriptionView() {
