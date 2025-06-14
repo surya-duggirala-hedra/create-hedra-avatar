@@ -64,6 +64,132 @@ export default function Page() {
   );
 }
 
+function CustomAvatarSetup(props: { onSubmit: (prompt: string) => void }) {
+  const [prompt, setPrompt] = useState("");
+  
+  return (
+    <div className="flex flex-col items-center gap-6 w-full max-w-2xl mx-auto">
+      <textarea
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+        placeholder="Describe your avatar..."
+        className="w-full h-32 p-4 rounded-lg bg-white/10 text-white resize-none"
+      />
+      <button
+        onClick={() => props.onSubmit(prompt)}
+        disabled={!prompt}
+        className="uppercase px-6 py-3 bg-white text-black rounded-md disabled:opacity-50"
+      >
+        Generate Avatar
+      </button>
+    </div>
+  );
+}
+
+function AvatarPreview() {
+  return (
+    <div className="w-96 h-96 bg-white/10 rounded-lg">
+      {/* Avatar generation will stream here */}
+    </div>
+  );
+}
+
+function CustomAvatarFlow(props: { onConnectButtonClicked: () => void }) {
+  const [step, setStep] = useState<"setup" | "preview" | "chat">("setup");
+  const { state: agentState } = useVoiceAssistant();
+
+  const handleSubmit = (prompt: string) => {
+    // Here you would handle the avatar generation
+    console.log("Generating avatar with prompt:", prompt);
+    setStep("preview");
+  };
+
+  if (step === "setup") {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.3, ease: [0.09, 1.04, 0.245, 1.055] }}
+        className="grid gap-8 items-center justify-center h-full"
+      >
+        <CustomAvatarSetup onSubmit={handleSubmit} />
+      </motion.div>
+    );
+  }
+
+  if (step === "preview") {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.3, ease: [0.09, 1.04, 0.245, 1.055] }}
+        className="flex flex-col items-center gap-8 h-full"
+      >
+        <AvatarPreview />
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+          className="uppercase px-4 py-2 bg-white text-black rounded-md"
+          onClick={() => {
+            setStep("chat");
+            props.onConnectButtonClicked();
+          }}
+        >
+          Start Conversation
+        </motion.button>
+      </motion.div>
+    );
+  }
+
+  return (
+    <AnimatePresence mode="wait">
+      {agentState === "disconnected" ? (
+        <motion.div
+          key="disconnected"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.3, ease: [0.09, 1.04, 0.245, 1.055] }}
+          className="grid items-center justify-center h-full"
+        >
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            className="uppercase px-4 py-2 bg-white text-black rounded-md"
+            onClick={() => props.onConnectButtonClicked()}
+          >
+            Reconnect
+          </motion.button>
+        </motion.div>
+      ) : (
+        <motion.div
+          key="connected"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3, ease: [0.09, 1.04, 0.245, 1.055] }}
+          className="flex flex-col items-center gap-4 h-full"
+        >
+          <AgentVisualizer />
+          <div className="flex-1 w-full">
+            <TranscriptionView />
+          </div>
+          <div className="w-full">
+            <ControlBar onConnectButtonClicked={props.onConnectButtonClicked} />
+          </div>
+          <RoomAudioRenderer />
+          <NoAgentNotification state={agentState} />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+
 function SimpleVoiceAssistant(props: { onConnectButtonClicked: () => void }) {
   const { state: agentState } = useVoiceAssistant();
 
@@ -86,7 +212,7 @@ function SimpleVoiceAssistant(props: { onConnectButtonClicked: () => void }) {
               className="uppercase px-4 py-2 bg-white text-black rounded-md"
               onClick={() => props.onConnectButtonClicked()}
             >
-              Start a conversation
+              Quickstart a conversation
             </motion.button>
           </motion.div>
         ) : (
@@ -151,7 +277,7 @@ function ControlBar(props: { onConnectButtonClicked: () => void }) {
             className="uppercase absolute left-1/2 -translate-x-1/2 px-4 py-2 bg-white text-black rounded-md"
             onClick={() => props.onConnectButtonClicked()}
           >
-            Start a conversation
+            Quickstart a conversation
           </motion.button>
         )}
       </AnimatePresence>
