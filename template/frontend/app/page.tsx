@@ -106,50 +106,37 @@ function CustomAvatarSetup(props: { onSubmit: (prompt: string) => void }) {
         placeholder="Describe your avatar..."
         className="w-full h-32 p-4 rounded-lg bg-white/10 text-white resize-none"
       />
-      <button
-        onClick={() => props.onSubmit(prompt)}
-        disabled={!prompt}
-        className="uppercase px-6 py-3 bg-white text-black rounded-md disabled:opacity-50"
-      >
-        Generate Avatar
-      </button>
-    </div>
-  );
-}
-
-function AvatarPreview() {
-  return (
-    <div className="w-96 h-96 bg-white/10 rounded-lg">
-      {/* Avatar generation will stream here */}
+      <div className="flex gap-4">
+        <button
+          onClick={() => props.onSubmit(prompt)}
+          disabled={!prompt}
+          className="uppercase px-6 py-3 bg-white text-black rounded-md disabled:opacity-50"
+        >
+          Generate
+        </button>
+      </div>
     </div>
   );
 }
 
 function CustomAvatarFlow(props: { onConnectButtonClicked: () => void }) {
-  const [step, setStep] = useState<"setup" | "preview" | "chat">("setup");
   const { state: agentState } = useVoiceAssistant();
+  const [isCustomizing, setIsCustomizing] = useState(false);
+  const [generatedAvatar, setGeneratedAvatar] = useState<string | null>(null);
 
-  const handleSubmit = (prompt: string) => {
-    // Here you would handle the avatar generation
+  const handleGenerate = (prompt: string) => {
+    // Here you would handle the avatar generation and get back an image URL
     console.log("Generating avatar with prompt:", prompt);
-    setStep("preview");
+    // Simulating avatar generation - replace with actual API call
+    setGeneratedAvatar("placeholder-url");
   };
 
-  if (step === "setup") {
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        transition={{ duration: 0.3, ease: [0.09, 1.04, 0.245, 1.055] }}
-        className="grid gap-8 items-center justify-center h-full"
-      >
-        <CustomAvatarSetup onSubmit={handleSubmit} />
-      </motion.div>
-    );
-  }
+  const handleSubmit = () => {
+    setIsCustomizing(false);
+    props.onConnectButtonClicked();
+  };
 
-  if (step === "preview") {
+  if (isCustomizing) {
     return (
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -158,30 +145,23 @@ function CustomAvatarFlow(props: { onConnectButtonClicked: () => void }) {
         transition={{ duration: 0.3, ease: [0.09, 1.04, 0.245, 1.055] }}
         className="flex flex-col items-center gap-8 h-full"
       >
-        <AvatarPreview />
-        <div className="flex gap-4">
+        {generatedAvatar && (
+          <div className="w-96 h-96 bg-white/10 rounded-lg">
+            {/* Display generated avatar here */}
+          </div>
+        )}
+        <CustomAvatarSetup onSubmit={handleGenerate} />
+        {generatedAvatar && (
           <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
-            className="uppercase px-4 py-2 bg-white/10 text-white rounded-md hover:bg-white/20"
-            onClick={() => setStep("setup")}
+            className="uppercase px-6 py-3 bg-white text-black rounded-md"
+            onClick={handleSubmit}
           >
-            Back
+            Submit
           </motion.button>
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-            className="uppercase px-4 py-2 bg-white text-black rounded-md"
-            onClick={() => {
-              setStep("chat");
-              props.onConnectButtonClicked();
-            }}
-          >
-            Start Conversation
-          </motion.button>
-        </div>
+        )}
       </motion.div>
     );
   }
@@ -197,26 +177,15 @@ function CustomAvatarFlow(props: { onConnectButtonClicked: () => void }) {
           transition={{ duration: 0.3, ease: [0.09, 1.04, 0.245, 1.055] }}
           className="grid items-center justify-center h-full"
         >
-          <div className="flex gap-4">
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-              className="uppercase px-4 py-2 bg-white/10 text-white rounded-md hover:bg-white/20"
-              onClick={() => setStep("preview")}
-            >
-              Back
-            </motion.button>
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
-              className="uppercase px-4 py-2 bg-white text-black rounded-md"
-              onClick={() => props.onConnectButtonClicked()}
-            >
-              Reconnect
-            </motion.button>
-          </div>
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            className="uppercase px-4 py-2 bg-white text-black rounded-md"
+            onClick={() => setIsCustomizing(true)}
+          >
+            Customize Avatar
+          </motion.button>
         </motion.div>
       ) : (
         <motion.div
@@ -241,7 +210,6 @@ function CustomAvatarFlow(props: { onConnectButtonClicked: () => void }) {
     </AnimatePresence>
   );
 }
-
 
 function SimpleVoiceAssistant(props: { onConnectButtonClicked: () => void }) {
   const { state: agentState } = useVoiceAssistant();
