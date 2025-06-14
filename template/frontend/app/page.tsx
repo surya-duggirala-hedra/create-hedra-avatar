@@ -19,6 +19,7 @@ import type { ConnectionDetails } from "./api/connection-details/route";
 
 export default function Page() {
   const [room] = useState(new Room());
+  const [selectedFlow, setSelectedFlow] = useState<'quickstart' | 'custom' | null>(null);
 
   const onConnectButtonClicked = useCallback(async () => {
     // Generate room connection details, including:
@@ -50,14 +51,44 @@ export default function Page() {
   }, [room]);
 
   return (
-    // anchor
     <main data-lk-theme="default" className="h-full grid content-center bg-[var(--lk-bg)]">
       <div className="w-full flex justify-center mb-8">
         <img src="assets/hedra_logo.svg" alt="Hedra Logo" className="h-16 w-auto" />
       </div>
       <RoomContext.Provider value={room}>
         <div className="lk-room-container max-w-[1024px] w-[90vw] mx-auto max-h-[90vh]">
-          <SimpleVoiceAssistant onConnectButtonClicked={onConnectButtonClicked} />
+          {!selectedFlow ? (
+            <div className="grid grid-cols-2 gap-8">
+              <div onClick={() => setSelectedFlow('quickstart')} className="cursor-pointer">
+                <h2 className="text-xl font-bold mb-4 text-center text-white">Quickstart</h2>
+                <SimpleVoiceAssistant onConnectButtonClicked={onConnectButtonClicked} />
+              </div>
+              <div onClick={() => setSelectedFlow('custom')} className="cursor-pointer">
+                <h2 className="text-xl font-bold mb-4 text-center text-white">Custom Avatar</h2>
+                <CustomAvatarFlow onConnectButtonClicked={onConnectButtonClicked} />
+              </div>
+            </div>
+          ) : (
+            <div className="w-full">
+              <div className="flex justify-between items-center mb-8">
+                <button 
+                  onClick={() => setSelectedFlow(null)}
+                  className="px-4 py-2 bg-white/10 text-white rounded-md hover:bg-white/20"
+                >
+                  ← Back to Selection
+                </button>
+                <h2 className="text-xl font-bold text-center text-white">
+                  {selectedFlow === 'quickstart' ? 'Quickstart' : 'Custom Avatar'}
+                </h2>
+                <div className="w-[100px]"></div> {/* Spacer for centering */}
+              </div>
+              {selectedFlow === 'quickstart' ? (
+                <SimpleVoiceAssistant onConnectButtonClicked={onConnectButtonClicked} />
+              ) : (
+                <CustomAvatarFlow onConnectButtonClicked={onConnectButtonClicked} />
+              )}
+            </div>
+          )}
         </div>
       </RoomContext.Provider>
     </main>
@@ -128,18 +159,29 @@ function CustomAvatarFlow(props: { onConnectButtonClicked: () => void }) {
         className="flex flex-col items-center gap-8 h-full"
       >
         <AvatarPreview />
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-          className="uppercase px-4 py-2 bg-white text-black rounded-md"
-          onClick={() => {
-            setStep("chat");
-            props.onConnectButtonClicked();
-          }}
-        >
-          Start Conversation
-        </motion.button>
+        <div className="flex gap-4">
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="uppercase px-4 py-2 bg-white/10 text-white rounded-md hover:bg-white/20"
+            onClick={() => setStep("setup")}
+          >
+            Back
+          </motion.button>
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            className="uppercase px-4 py-2 bg-white text-black rounded-md"
+            onClick={() => {
+              setStep("chat");
+              props.onConnectButtonClicked();
+            }}
+          >
+            Start Conversation
+          </motion.button>
+        </div>
       </motion.div>
     );
   }
@@ -155,15 +197,26 @@ function CustomAvatarFlow(props: { onConnectButtonClicked: () => void }) {
           transition={{ duration: 0.3, ease: [0.09, 1.04, 0.245, 1.055] }}
           className="grid items-center justify-center h-full"
         >
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-            className="uppercase px-4 py-2 bg-white text-black rounded-md"
-            onClick={() => props.onConnectButtonClicked()}
-          >
-            Reconnect
-          </motion.button>
+          <div className="flex gap-4">
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="uppercase px-4 py-2 bg-white/10 text-white rounded-md hover:bg-white/20"
+              onClick={() => setStep("preview")}
+            >
+              Back
+            </motion.button>
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+              className="uppercase px-4 py-2 bg-white text-black rounded-md"
+              onClick={() => props.onConnectButtonClicked()}
+            >
+              Reconnect
+            </motion.button>
+          </div>
         </motion.div>
       ) : (
         <motion.div
