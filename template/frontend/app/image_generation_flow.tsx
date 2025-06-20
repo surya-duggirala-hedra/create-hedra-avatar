@@ -106,25 +106,6 @@ export function CustomAvatarFlow(props: { onConnectButtonClicked: () => void, Co
     };
   };
 
-  const getImageFromS3 = async (assetId: string) => {
-    const response = await fetch(`https://api.staging.hedra.com/web-app/public/assets?type=image&ids=${assetId}`, {
-      headers: {
-        'x-api-key': process.env.NEXT_PUBLIC_HEDRA_API_KEY
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to get image from S3: ${response.status}`);
-    }
-
-    const data = await response.json();
-    if (!data?.[0]?.asset?.url) {
-      throw new Error('No image URL found in response');
-    }
-
-    return data[0].asset.url;
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
