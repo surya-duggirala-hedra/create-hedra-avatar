@@ -1,55 +1,56 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 export function CustomAvatarFlow(props: { onConnectButtonClicked: () => void, ControlBar: React.ComponentType<{ onConnectButtonClicked: () => void }> }) {
   const [prompt, setPrompt] = useState("");
   const [assetId, setAssetId] = useState<string | null>(null);
+  const [generationId, setGenerationId] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
-    let pollInterval: NodeJS.Timeout;
-
-    const pollStatus = async () => {
-      if (!assetId) return;
-
+    if (!generationId) return;
+  
+    let isCancelled = false;
+    setIsGenerating(true);
+  
+    const poll = async () => {
       try {
-        const statusResponse = await getImageGenerationStatus(assetId);
-        if (statusResponse.state === 'complete') {
-          const imageUrl = await getImageFromS3(assetId);
-          setImageUrl(imageUrl);
+        const status = await getImageGenerationStatus(generationId);
+        if (isCancelled) return;
+  
+        if (status.state === 'complete') {
+          setImageUrl(status.url);
           setIsGenerating(false);
           props.onConnectButtonClicked();
-          clearInterval(pollInterval);
-        } else if (statusResponse.state === 'error') {
-          console.error('Image generation failed:', statusResponse.errorMessage);
+        } else if (status.state === 'error') {
+          console.error('Image generation failed:', status.errorMessage);
           setIsGenerating(false);
+        } else {
+          setTimeout(poll, 2000); // Re-poll in 2 sec
         }
-      } catch (error) {
-        console.error('Error polling status:', error);
-        clearInterval(pollInterval);
+      } catch (err) {
+        console.error('Polling failed:', err);
         setIsGenerating(false);
       }
     };
-
-    if (assetId) {
-      pollInterval = setInterval(pollStatus, 2000); // Poll every 2 seconds
-    }
-
+  
+    poll(); // Start polling
+  
     return () => {
-      if (pollInterval) {
-        clearInterval(pollInterval);
-      }
+      isCancelled = true;
     };
-  }, [assetId, props]);
+  }, [generationId]);
+  
 
   const handleSubmit = async () => {
     try {
       setIsGenerating(true);
-      const assetId = await sendImageGenerationRequest(prompt);
+      const { assetId, generationId } = await sendImageGenerationRequest(prompt);
       setAssetId(assetId);
+      setGenerationId(generationId);
     } catch (error) {
       console.error('Error generating image:', error);
       setIsGenerating(false);
@@ -57,30 +58,41 @@ export function CustomAvatarFlow(props: { onConnectButtonClicked: () => void, Co
   };
 
   const sendImageGenerationRequest = async (prompt: string) => {
-    const response = await fetch('https://api.staging.hedra.com/web-app/generations', {
+    const response = await fetch('https://api.staging.hedra.com/web-app/public/generations', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.NEXT_PUBLIC_HEDRA_API_KEY
       },
       body: JSON.stringify({
         type: 'image',
-        text_prompt: prompt,
-        aspect_ratio: '1:1',
-        resolution: '1024x1024',
-        ai_model_id: 'f8f8ef36-9665-4e48-b54e-802196771293' // Flux Dev
+        text_prompt: prompt + " This is an image being used for a custom avatar. Make sure it is rendered like a high quality Linkedin profile picture.",
+        "aspect_ratio": "1:1",
+        "resolution": "540p",
+        ai_model_id: 'dd370137-90ee-4246-a312-f30f8944429a' // Flux Dev
       })
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(errorText);
       throw new Error(`Image generation request failed: ${response.status}`);
     }
 
     const data = await response.json();
-    return data.asset_id;
+    return { assetId: data.asset_id, generationId: data.id };
   };
 
-  const getImageGenerationStatus = async (jobId: string) => {
-    const response = await fetch(`https://api.staging.hedra.com/web-app/public/generations/${jobId}/status`);
+  const getImageGenerationStatus = async (jobId: string | null) => {
+    if (!jobId) {
+      throw new Error('Generation ID is required');
+    }
+
+    const response = await fetch(`https://api.staging.hedra.com/web-app/public/generations/${jobId}/status`, {
+      headers: {
+        'x-api-key': process.env.NEXT_PUBLIC_HEDRA_API_KEY
+      }
+    });
     
     if (!response.ok) {
       throw new Error(`Failed to get generation status: ${response.status}`);
@@ -94,10 +106,23 @@ export function CustomAvatarFlow(props: { onConnectButtonClicked: () => void, Co
     };
   };
 
-  const getImageFromS3 = async (imageKey: string) => {
-    // TODO: Implement fetching generated image from S3
-    // Should return image URL or blob
-    throw new Error("Not implemented");
+  const getImageFromS3 = async (assetId: string) => {
+    const response = await fetch(`https://api.staging.hedra.com/web-app/public/assets?type=image&ids=${assetId}`, {
+      headers: {
+        'x-api-key': process.env.NEXT_PUBLIC_HEDRA_API_KEY
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to get image from S3: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (!data?.[0]?.asset?.url) {
+      throw new Error('No image URL found in response');
+    }
+
+    return data[0].asset.url;
   };
 
   return (
@@ -107,13 +132,18 @@ export function CustomAvatarFlow(props: { onConnectButtonClicked: () => void, Co
       transition={{ duration: 0.3, ease: [0.09, 1.04, 0.245, 1.055] }}
       className="flex flex-col items-center gap-8 h-full"
     >
-      <div className="w-96 h-96 bg-white/10 rounded-lg">
+      <div className="w-96 h-96 bg-white/10 rounded-lg relative">
         {imageUrl && (
           <img 
             src={imageUrl} 
             alt="Generated avatar"
             className="w-full h-full object-cover rounded-lg"
           />
+        )}
+        {isGenerating && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+          </div>
         )}
       </div>
 
