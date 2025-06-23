@@ -16,13 +16,20 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Room, RoomEvent } from "livekit-client";
 import { useCallback, useEffect, useState } from "react";
 import type { ConnectionDetails } from "./api/connection-details/route";
-import { CustomAvatarFlow } from "./image_generation_flow";
 
 export default function Page() {
   const [room] = useState(new Room());
-  const [selectedFlow, setSelectedFlow] = useState<'quickstart' | 'custom' | null>(null);
 
   const onConnectButtonClicked = useCallback(async () => {
+    // Generate room connection details, including:
+    //   - A random Room name
+    //   - A random Participant name
+    //   - An Access Token to permit the participant to join the room
+    //   - The URL of the LiveKit server to connect to
+    //
+    // In real-world application, you would likely allow the user to specify their
+    // own participant name, and possibly to choose from existing rooms to join.
+
     const url = new URL(
       process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT ?? "/api/connection-details",
       window.location.origin
@@ -36,63 +43,21 @@ export default function Page() {
 
   useEffect(() => {
     room.on(RoomEvent.MediaDevicesError, onDeviceFailure);
+
     return () => {
       room.off(RoomEvent.MediaDevicesError, onDeviceFailure);
     };
   }, [room]);
 
   return (
+    // anchor
     <main data-lk-theme="default" className="h-full grid content-center bg-[var(--lk-bg)]">
       <div className="w-full flex justify-center mb-8">
         <img src="assets/hedra_logo.svg" alt="Hedra Logo" className="h-16 w-auto" />
       </div>
       <RoomContext.Provider value={room}>
         <div className="lk-room-container max-w-[1024px] w-[90vw] mx-auto max-h-[90vh]">
-          <AnimatePresence mode="wait">
-            {!selectedFlow ? (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex flex-col items-center gap-6"
-              >
-                <button
-                  onClick={async () => {
-                    setSelectedFlow('quickstart');
-                    await onConnectButtonClicked();
-                  }}
-                  className="w-64 px-6 py-4 bg-white text-black rounded-lg hover:bg-white/90 transition-colors"
-                >
-                  Quickstart a Conversation
-                </button>
-                <button
-                  onClick={() => setSelectedFlow('custom')}
-                  className="w-64 px-6 py-4 bg-white text-black rounded-lg hover:bg-white/90 transition-colors"
-                >
-                  Create Custom Avatar
-                </button>
-              </motion.div>
-            ) : (
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="w-full flex flex-col items-center"
-              >
-                {selectedFlow === 'quickstart' ? (
-                  <SimpleVoiceAssistant onConnectButtonClicked={onConnectButtonClicked} />
-                ) : (
-                  <CustomAvatarFlow onConnectButtonClicked={onConnectButtonClicked} ControlBar={ControlBar} />
-                )}
-                <button 
-                  onClick={() => setSelectedFlow(null)}
-                  className="w-64 px-6 py-4 mt-8 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
-                >
-                  ← Back
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <SimpleVoiceAssistant onConnectButtonClicked={onConnectButtonClicked} />
         </div>
       </RoomContext.Provider>
     </main>
@@ -114,14 +79,15 @@ function SimpleVoiceAssistant(props: { onConnectButtonClicked: () => void }) {
             transition={{ duration: 0.3, ease: [0.09, 1.04, 0.245, 1.055] }}
             className="grid items-center justify-center h-full"
           >
-            <motion.div
+            <motion.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3, delay: 0.1 }}
-              className="uppercase px-4 py-2 text-white"
+              className="uppercase px-4 py-2 bg-white text-black rounded-md"
+              onClick={() => props.onConnectButtonClicked()}
             >
-              Connecting...
-            </motion.div>
+              Start a conversation
+            </motion.button>
           </motion.div>
         ) : (
           <motion.div
@@ -185,7 +151,7 @@ function ControlBar(props: { onConnectButtonClicked: () => void }) {
             className="uppercase absolute left-1/2 -translate-x-1/2 px-4 py-2 bg-white text-black rounded-md"
             onClick={() => props.onConnectButtonClicked()}
           >
-            Quickstart a conversation
+            Start a conversation
           </motion.button>
         )}
       </AnimatePresence>
