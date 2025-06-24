@@ -2,7 +2,7 @@
   "name": "hedra-avatar-app",
   "version": "0.1.6",
   "scripts": {
-    "start-app": "pnpm install && pnpm dev --prefix frontend",
-    "start-agent": "pip install -r backend/requirements.txt && python backend/agent_worker.py start"
+    "start-app": "cd frontend && pnpm install && pnpm dev",
+    "start-agent": "cd backend && pip install -r requirements.txt && python agent_worker.py start"
   }
 }
