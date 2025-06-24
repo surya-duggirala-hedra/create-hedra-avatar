@@ -78,6 +78,9 @@ async function main() {
   To start the backend: npm run start-agent
 
   Your app will be available at http://localhost:3000 once both frontend and backend are running.
+
+  Remember to set your .env.local file with the correct values.
+  You can find the relevant .env.example file in the template/frontend and template/backend directories.
 `);
 }
 
