@@ -1,9 +1,9 @@
 {
-    "name": "@surya-duggirala-hedra/create-hedra-avatar",
-    "version": "0.1.11",
-    "description": "Scaffold a LiveKit + Hedra Avatar app with Python backend and React frontend",
+    "name": "create-hedra-avatar",
+    "version": "1.0.0",
+    "description": "Scaffolding for a LiveKit + Hedra Realtime Avatar app with a Python backend and React frontend",
     "bin": {
-        "create-hedra-avatar": "./create.cjs"
+        "create-hedra-avatar": "create.js"
     },
     "files": [
         "create.js",
@@ -20,8 +20,8 @@
     ],
     "author": "Surya Duggirala",
     "scripts": {
-        "build": "npx esbuild create.js --bundle --platform=node --outfile=dist/create.js",
-        "publish": "npm publish"
+        "build": "npx esbuild create.js --bundle --platform=node --outfile=dist/create.cjs",
+        "deploy": "npm publish"
     },
     "dependencies": {
         "child_process": "^1.0.2",
