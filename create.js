@@ -75,7 +75,7 @@ async function main() {
   cd ${projectName}
   
   To start the frontend: npm run start-app
-  To start the backend: npm run start-agent
+  To start the backend: npm run start-agent # in a new terminal
 
   Your app will be available at http://localhost:3000 once both frontend and backend are running.
 

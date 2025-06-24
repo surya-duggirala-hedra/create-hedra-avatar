@@ -20,7 +20,7 @@ async def entrypoint(ctx: JobContext):
     )
 
     # upload an avatar image or use an avatar id from hedra
-    avatar_image = Image.open(os.path.join(os.path.dirname(__file__), "assets/default_avatar.png"))
+    avatar_image = Image.open(os.path.join(os.path.dirname(__file__), "assets/fred.png"))
     hedra_avatar = hedra.AvatarSession(avatar_image=avatar_image)
     await hedra_avatar.start(session, room=ctx.room)
 
