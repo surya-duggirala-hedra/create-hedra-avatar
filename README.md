@@ -1,5 +1,5 @@
 # Prerequisites
-TODO(ENG-4482)
+TODO(ENG-4482): Note that we can ignore the `asset_id` work since we can just point directly to an image via filepath.
 
 # Install and Start Realtime Avatar
 ```
