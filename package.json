@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "Scaffolding for a LiveKit + Hedra Realtime Avatar app with a Python backend and React frontend",
     "bin": {
-        "create-hedra-avatar": "create.js"
+        "create-hedra-avatar-test": "create.js"
     },
     "files": [
         "create.js",
